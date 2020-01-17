@@ -14,7 +14,7 @@ namespace CharityEngine_Q1.Models
         private void connection()
         {
             //Retrieving connection string from Web.config file
-            string constring = ConfigurationManager.ConnectionStrings["appartmentconn"].ToString();
+            string constring = ConfigurationManager.ConnectionStrings["appartmentconn"].ConnectionString;
             con = new SqlConnection(constring);
         }
 
@@ -35,6 +35,7 @@ namespace CharityEngine_Q1.Models
                     WHERE vehicle_registration_number = {registrationNumber}";
 
             SqlCommand cmd = new SqlCommand();
+            cmd.Connection = con;
             cmd.CommandType = CommandType.Text;
             cmd.CommandText = sqlCmd;
 
@@ -58,23 +59,25 @@ namespace CharityEngine_Q1.Models
         }
 
         // **************** SEARCH FOR A VEHICULE OR FETCH ALL VEHICLES *********************
-        public List<VehicleModel> GetVehicles(int registrationNumber = 0)
+        public List<VehicleModel> GetVehicles(int registrationNumber)
         {
             List<VehicleModel> vehicles = new List<VehicleModel>();
             connection();
 
-            string sqlCmd = (registrationNumber == 0) ? $"SELECT * FROM vehicle WHERE vehicle_registration_number = {registrationNumber}" : "SELECT * FROM vehicle";
+            //if registrationNumber = 0, we fetch all vehicle in DB
+            //else we select only the vehicle by its id
+            string sqlCmd = (registrationNumber > 0) ? $"SELECT * FROM vehicle WHERE vehicle_registration_number = {registrationNumber}" : "SELECT * FROM vehicle";
 
             SqlCommand cmd = new SqlCommand(sqlCmd, con);
             cmd.CommandType = CommandType.Text;
 
             con.Open();
 
-            SqlDataReader rdr = cmd.ExecuteReader();
-            var vehicle = new VehicleModel();
+            SqlDataReader rdr = cmd.ExecuteReader();           
             while (rdr.Read())
             {
-                vehicle.VehiceRegistrationNumber = Convert.ToInt32(rdr["Id"]);
+                var vehicle = new VehicleModel();
+                vehicle.VehiceRegistrationNumber = Convert.ToInt32(rdr["vehicle_registration_number"]);
                 vehicle.OwnerName = rdr["owner_name"].ToString();
                 vehicle.OwnerPhoneNumber = Convert.ToInt32(rdr["owner_phone_number"]);
                 vehicle.OwnerUnitNumber = rdr["owner_unit_number"].ToString();

@@ -1,8 +1,19 @@
 ﻿@model IEnumerable<CharityEngine_Q1.Models.VehicleModel>
-
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Create New Vehicle", "Create")
 </p>
+<hr />
+@using (Html.BeginForm("Index", "Vehicle", FormMethod.Post))
+{
+    <div class="form-group col-md-6">
+        Search for vehicle by registration number:
+        @Html.TextBox("RegistrationNumber", (object)ViewBag.RegistrationNumber, new { @class = "form-control" })
+        <br />
+        <input type="submit" value="Search" class="btn btn-default" />
+        <a href="/Vehicle/Index" class="btn btn-default">Clear</a>
+    </div>
+}
+<br /><br />
 <table class="table">
     <tr>
         <td>
@@ -66,7 +77,7 @@
                 @Html.DisplayFor(model => item.RegistrationDate)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.VehiceRegistrationNumber }))
+                @Html.ActionLink("Edit", "Edit", new { id = item.VehiceRegistrationNumber })
             </td>
         </tr>
     }
